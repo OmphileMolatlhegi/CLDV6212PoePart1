@@ -1,0 +1,75 @@
+﻿@model ABCRetail.ViewModels.HomeViewModel
+
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome to ABC Retail</h1>
+    <p>Manage your online retail operations efficiently</p>
+</div>
+
+<div class="row mt-5">
+    <div class="col-md-3">
+        <div class="card text-white bg-primary mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Customers</h5>
+                <p class="card-text display-4">@Model.CustomerCount</p>
+                <a asp-controller="Customer" asp-action="Index" class="btn btn-light">Manage</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-success mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Products</h5>
+                <p class="card-text display-4">@Model.ProductCount</p>
+                <a asp-controller="Product" asp-action="Index" class="btn btn-light">Manage</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-info mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Orders</h5>
+                <p class="card-text display-4">@Model.OrderCount</p>
+                <a asp-controller="Order" asp-action="Index" class="btn btn-light">Manage</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-warning mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Upload</h5>
+                <p class="card-text">Payment Proofs</p>
+                <a asp-controller="Upload" asp-action="Index" class="btn btn-light">Upload</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-5">
+    <div class="col-12">
+        <h3>Featured Products</h3>
+        <div class="row">
+            @foreach (var product in Model.FeaturedProducts)
+            {
+                <div class="col-md-2 mb-3">
+                    <div class="card">
+                        @if (!string.IsNullOrEmpty(product.ImageUrl))
+                        {
+                            <img src="@product.ImageUrl" class="card-img-top" alt="@product.ProductName" style="height: 120px; object-fit: cover;">
+                        }
+                        <div class="card-body">
+                            <h6 class="card-title">@product.ProductName</h6>
+                            <p class="card-text">$@product.Price</p>
+                            <span class="badge @(product.StockAvailable > 10 ? "bg-success" : product.StockAvailable > 0 ? "bg-warning" : "bg-danger")">
+                                Stock: @product.StockAvailable
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>

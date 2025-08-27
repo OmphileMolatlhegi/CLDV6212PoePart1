@@ -1,0 +1,122 @@
+﻿@model ABCRetail.Models.Product
+
+@{
+    ViewData["Title"] = "Delete Product";
+}
+
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card">
+            <div class="card-header bg-danger text-white">
+                <h3 class="card-title">@ViewData["Title"]</h3>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-warning" role="alert">
+                    <h4 class="alert-heading">
+                        <i class="fas fa-exclamation-triangle"></i> Warning!
+                    </h4>
+                    <p>You are about to delete this product permanently. This action cannot be undone.</p>
+                    <hr>
+                    <p class="mb-0">Deleting products may affect existing orders and inventory records.</p>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card mb-3">
+                            <div class="card-header bg-light">
+                                <h6 class="card-title mb-0">Product Details</h6>
+                            </div>
+                            <div class="card-body">
+                                <dl>
+                                    <dt>Product ID:</dt>
+                                    <dd>@Model.ProductId</dd>
+
+                                    <dt>Product Name:</dt>
+                                    <dd>@Model.ProductName</dd>
+
+                                    <dt>Description:</dt>
+                                    <dd>@Model.Description</dd>
+
+                                    <dt>Price:</dt>
+                                    <dd>$@Model.Price.ToString("N2")</dd>
+
+                                    <dt>Stock Available:</dt>
+                                    <dd>
+                                        <span class="badge @(Model.StockAvailable > 10 ? "bg-success" : Model.StockAvailable > 0 ? "bg-warning" : "bg-danger")">
+                                            @Model.StockAvailable units
+                                        </span>
+                                    </dd>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card mb-3">
+                            <div class="card-header bg-light">
+                                <h6 class="card-title mb-0">Product Image</h6>
+                            </div>
+                            <div class="card-body text-center">
+                                @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                                {
+                                    <img src="@Model.ImageUrl" alt="@Model.ProductName"
+                                         class="img-fluid rounded" style="max-height: 200px;">
+                                    <p class="text-muted mt-2 small">Current product image</p>
+                                }
+                                else
+                                {
+                                    <div class="bg-light d-flex align-items-center justify-content-center"
+                                         style="height: 200px;">
+                                        <i class="fas fa-image text-muted fa-3x"></i>
+                                    </div>
+                                    <p class="text-muted mt-2 small">No image available</p>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                @if (Model.StockAvailable > 0)
+                {
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        This product currently has <strong>@Model.StockAvailable units</strong> in stock.
+                        Deleting it will remove all inventory records.
+                    </div>
+                }
+
+                <form asp-action="Delete" method="post">
+                    <input type="hidden" name="id" value="@Model.ProductId" />
+
+                    <div class="form-group">
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="confirmDelete" required>
+                            <label class="form-check-label" for="confirmDelete">
+                                I understand that this action cannot be undone and I want to proceed with deletion.
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-danger" id="deleteButton" disabled>
+                            <i class="fas fa-trash"></i> Confirm Delete
+                        </button>
+                        <a asp-action="Index" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Enable delete button only when checkbox is checked
+            $('#confirmDelete').change(function() {
+                $('#deleteButton').prop('disabled', !$(this).is(':checked'));
+            });
+        });
+    </script>
+}

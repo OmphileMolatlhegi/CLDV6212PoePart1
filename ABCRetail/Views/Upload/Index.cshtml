@@ -1,0 +1,308 @@
+﻿@model ABCRetail.Models.FileUploadModel
+
+@{
+    ViewData["Title"] = "Upload Payment Proof";
+}
+
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h3 class="card-title mb-0">
+                    <i class="fas fa-file-upload me-2"></i>@ViewData["Title"]
+                </h3>
+                <p class="card-subtitle mb-0 mt-1">Upload proof of payment for order processing</p>
+            </div>
+            <div class="card-body">
+                <!-- Success/Error Messages -->
+                @if (TempData["SuccessMessage"] != null)
+                {
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <i class="fas fa-check-circle me-2"></i>@TempData["SuccessMessage"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                }
+
+                @if (TempData["ErrorMessage"] != null)
+                {
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i class="fas fa-exclamation-circle me-2"></i>@TempData["ErrorMessage"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                }
+
+                <!-- Upload Instructions -->
+                <div class="alert alert-info mb-4">
+                    <h5 class="alert-heading">
+                        <i class="fas fa-info-circle me-2"></i>Upload Instructions
+                    </h5>
+                    <ul class="mb-0 ps-3">
+                        <li>Supported file types: JPG, JPEG, PNG, PDF</li>
+                        <li>Maximum file size: 10MB</li>
+                        <li>Include order ID and customer name for reference</li>
+                        <li>Files are stored securely in Azure Blob Storage</li>
+                    </ul>
+                </div>
+
+                <form asp-action="Index" method="post" enctype="multipart/form-data" id="uploadForm">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                    <!-- Order Information -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label asp-for="OrderId" class="form-label">Order ID (Optional)</label>
+                                <input asp-for="OrderId" class="form-control" placeholder="e.g., ORD-12345" />
+                                <span asp-validation-for="OrderId" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label asp-for="CustomerName" class="form-label">Customer Name (Optional)</label>
+                                <input asp-for="CustomerName" class="form-control" placeholder="e.g., John Smith" />
+                                <span asp-validation-for="CustomerName" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- File Upload Section -->
+                    <div class="form-group mb-4">
+                        <label asp-for="ProofOfPayment" class="form-label">Proof of Payment File *</label>
+
+                        <div class="file-upload-area border rounded p-4 text-center" id="uploadArea">
+                            <input type="file" asp-for="ProofOfPayment" class="form-control-file d-none" id="fileInput"
+                                   accept=".jpg,.jpeg,.png,.pdf" />
+
+                            <div id="uploadPlaceholder">
+                                <i class="fas fa-cloud-upload-alt fa-3x text-muted mb-3"></i>
+                                <h5>Drag & Drop your file here</h5>
+                                <p class="text-muted">or click to browse</p>
+                                <button type="button" class="btn btn-outline-primary" onclick="document.getElementById('fileInput').click()">
+                                    <i class="fas fa-folder-open me-2"></i>Browse Files
+                                </button>
+                            </div>
+
+                            <div id="filePreview" style="display: none;">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <div class="d-flex align-items-center">
+                                        <i class="fas fa-file fa-2x text-primary me-3" id="fileIcon"></i>
+                                        <div>
+                                            <h6 id="fileName" class="mb-0"></h6>
+                                            <small class="text-muted" id="fileSize"></small>
+                                        </div>
+                                    </div>
+                                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="clearFile()">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <span asp-validation-for="ProofOfPayment" class="text-danger"></span>
+                        <small class="form-text text-muted">Upload screenshot, scan, or photo of payment confirmation</small>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-success btn-lg" id="submitButton">
+                            <i class="fas fa-upload me-2"></i>Upload File
+                        </button>
+                        <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">
+                            <i class="fas fa-home me-2"></i>Back to Home
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Upload Guidelines -->
+<div class="row mt-4">
+    <div class="col-md-8 mx-auto">
+        <div class="card">
+            <div class="card-header bg-light">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-history me-2"></i>Upload Guidelines
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card border-0">
+                            <div class="card-body">
+                                <h6 class="text-success">
+                                    <i class="fas fa-check-circle me-2"></i>Accepted Files
+                                </h6>
+                                <ul class="list-unstyled">
+                                    <li><i class="fas fa-file-image text-primary me-2"></i>JPG/JPEG images</li>
+                                    <li><i class="fas fa-file-image text-primary me-2"></i>PNG images</li>
+                                    <li><i class="fas fa-file-pdf text-danger me-2"></i>PDF documents</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card border-0">
+                            <div class="card-body">
+                                <h6 class="text-danger">
+                                    <i class="fas fa-times-circle me-2"></i>Rejected Files
+                                </h6>
+                                <ul class="list-unstyled">
+                                    <li><i class="fas fa-file-alt text-muted me-2"></i>Executable files (.exe, .bat)</li>
+                                    <li><i class="fas fa-file-code text-muted me-2"></i>Script files (.js, .py)</li>
+                                    <li><i class="fas fa-file-archive text-muted me-2"></i>Compressed files (.zip, .rar)</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .file-upload-area {
+            background-color: #f8f9fa;
+            border: 2px dashed #dee2e6;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            min-height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+            .file-upload-area:hover {
+                border-color: #0d6efd;
+                background-color: #e9ecef;
+            }
+
+            .file-upload-area.dragover {
+                border-color: #198754;
+                background-color: #d1e7dd;
+                transform: scale(1.02);
+            }
+
+        .fa-file-pdf {
+            color: #dc3545;
+        }
+
+        .fa-file-image {
+            color: #198754;
+        }
+    </style>
+}
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        $(document).ready(function() {
+            const fileInput = document.getElementById('fileInput');
+            const uploadArea = document.getElementById('uploadArea');
+            const uploadPlaceholder = document.getElementById('uploadPlaceholder');
+            const filePreview = document.getElementById('filePreview');
+            const fileName = document.getElementById('fileName');
+            const fileSize = document.getElementById('fileSize');
+            const fileIcon = document.getElementById('fileIcon');
+            const submitButton = document.getElementById('submitButton');
+
+            // Drag and drop functionality
+            uploadArea.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                uploadArea.classList.add('dragover');
+            });
+
+            uploadArea.addEventListener('dragleave', function() {
+                uploadArea.classList.remove('dragover');
+            });
+
+            uploadArea.addEventListener('drop', function(e) {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+
+                if (e.dataTransfer.files.length > 0) {
+                    fileInput.files = e.dataTransfer.files;
+                    handleFileSelection(e.dataTransfer.files[0]);
+                }
+            });
+
+            uploadArea.addEventListener('click', function() {
+                fileInput.click();
+            });
+
+            fileInput.addEventListener('change', function(e) {
+                if (this.files.length > 0) {
+                    handleFileSelection(this.files[0]);
+                }
+            });
+
+            function handleFileSelection(file) {
+                // Validate file type
+                const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf'];
+                if (!allowedTypes.includes(file.type)) {
+                    alert('Please select a valid file type (JPG, PNG, PDF)');
+                    clearFile();
+                    return;
+                }
+
+                // Validate file size (10MB max)
+                const maxSize = 10 * 1024 * 1024;
+                if (file.size > maxSize) {
+                    alert('File size must be less than 10MB');
+                    clearFile();
+                    return;
+                }
+
+                // Display file information
+                uploadPlaceholder.style.display = 'none';
+                filePreview.style.display = 'block';
+
+                fileName.textContent = file.name;
+                fileSize.textContent = formatFileSize(file.size);
+
+                // Set appropriate icon
+                if (file.type.includes('image')) {
+                    fileIcon.className = 'fas fa-file-image fa-2x text-success me-3';
+                } else if (file.type === 'application/pdf') {
+                    fileIcon.className = 'fas fa-file-pdf fa-2x text-danger me-3';
+                } else {
+                    fileIcon.className = 'fas fa-file fa-2x text-primary me-3';
+                }
+
+                // Enable submit button
+                submitButton.disabled = false;
+            }
+
+            function clearFile() {
+                fileInput.value = '';
+                uploadPlaceholder.style.display = 'block';
+                filePreview.style.display = 'none';
+                submitButton.disabled = false;
+            }
+
+            function formatFileSize(bytes) {
+                if (bytes === 0) return '0 Bytes';
+                const k = 1024;
+                const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            }
+
+            // Form validation
+            $('#uploadForm').on('submit', function() {
+                const file = fileInput.files[0];
+                if (!file) {
+                    alert('Please select a file to upload');
+                    return false;
+                }
+                return true;
+            });
+        });
+    </script>
+}

@@ -1,0 +1,121 @@
+﻿@model ABCRetail.Models.Product
+
+@{
+    ViewData["Title"] = "Add New Product";
+}
+
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">@ViewData["Title"]</h3>
+            </div>
+            <div class="card-body">
+                <form asp-action="Create" method="post" enctype="multipart/form-data">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label asp-for="ProductName" class="form-label">Product Name</label>
+                                <input asp-for="ProductName" class="form-control" placeholder="Enter product name" />
+                                <span asp-validation-for="ProductName" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label asp-for="Price" class="form-label">Price ($)</label>
+                                <input asp-for="Price" type="number" step="0.01" min="0" class="form-control" placeholder="0.00" />
+                                <span asp-validation-for="Price" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label asp-for="Description" class="form-label">Description</label>
+                        <textarea asp-for="Description" class="form-control" rows="3" placeholder="Enter product description"></textarea>
+                        <span asp-validation-for="Description" class="text-danger"></span>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label asp-for="StockAvailable" class="form-label">Stock Available</label>
+                                <input asp-for="StockAvailable" type="number" min="0" class="form-control" placeholder="0" />
+                                <span asp-validation-for="StockAvailable" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-4">
+                                <label asp-for="ImageUrl" class="form-label">Product Image</label>
+                                <input type="file" name="imageFile" class="form-control" accept="image/*" />
+                                <small class="form-text text-muted">Upload a product image (JPG, PNG, GIF)</small>
+                                <span asp-validation-for="ImageUrl" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Image Preview -->
+                    <div class="form-group mb-4" id="imagePreviewContainer" style="display: none;">
+                        <label class="form-label">Image Preview</label>
+                        <div class="border rounded p-3 text-center">
+                            <img id="imagePreview" class="img-fluid rounded" style="max-height: 200px;" />
+                            <p class="text-muted mt-2 small" id="fileName"></p>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Create Product
+                        </button>
+                        <a asp-action="Index" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Back to List
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        $(document).ready(function() {
+            // Image preview functionality
+            $('input[type="file"]').change(function(e) {
+                var file = e.target.files[0];
+                if (file) {
+                    var reader = new FileReader();
+                    reader.onload = function(e) {
+                        $('#imagePreview').attr('src', e.target.result);
+                        $('#fileName').text('File: ' + file.name);
+                        $('#imagePreviewContainer').show();
+                    }
+                    reader.readAsDataURL(file);
+                } else {
+                    $('#imagePreviewContainer').hide();
+                }
+            });
+
+            // Auto-format price input
+            $('#Price').on('blur', function() {
+                var value = parseFloat($(this).val());
+                if (!isNaN(value)) {
+                    $(this).val(value.toFixed(2));
+                }
+            });
+
+            // Stock validation
+            $('#StockAvailable').on('input', function() {
+                var stock = parseInt($(this).val()) || 0;
+                if (stock < 0) {
+                    $(this).val(0);
+                }
+            });
+        });
+    </script>
+}
